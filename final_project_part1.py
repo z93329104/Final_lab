@@ -114,3 +114,50 @@ def init_d(G):
                 d[i][j] = G.w(i, j)
         d[i][i] = 0
     return d
+
+def dijkstra_approx(G, source, k):
+    pred = {}
+    dist = {}
+    relax = {}
+    Q = min_heap.MinHeap([])
+    nodes = list(G.adj.keys())
+    for node in nodes:
+        Q.insert(min_heap.Element(node, float("inf")))
+        dist[node] = float("inf")
+        relax[node] = k
+    Q.decrease_key(source, 0)
+    relax[source] = relax[source] - 1
+    while not Q.is_empty():
+        current_element = Q.extract_min()
+        current_node = current_element.value
+        dist[current_node] = current_element.key
+        for neighbour in G.adj[current_node]:
+            if dist[current_node] + G.w(current_node, neighbour) < dist[neighbour]:
+                if relax[neighbour] > 0:
+                    Q.decrease_key(neighbour, dist[current_node] + G.w(current_node, neighbour))
+                    relax[neighbour] = relax[neighbour] - 1 
+                    dist[neighbour] = dist[current_node] + G.w(current_node, neighbour)
+                    pred[neighbour] = current_node
+    return dist
+    
+def bellman_ford_approx(G, source, k):
+    pred = {} #Predecessor dictionary. Isn't returned, but here for your understanding
+    dist = {} #Distance dictionary
+    relax = {}
+    nodes = list(G.adj.keys())
+
+    #Initialize distances
+    for node in nodes:
+        dist[node] = float("inf")
+        relax[node] = k
+    dist[source] = 0
+    relax[source] = relax[source] - 1
+    #Meat of the algorithm
+    for _ in range(G.number_of_nodes()):
+        for node in nodes:
+            for neighbour in G.adj[node]:
+                if dist[neighbour] > dist[node] + G.w(node, neighbour) and relax[neighbour] > 0:
+                    dist[neighbour] = dist[node] + G.w(node, neighbour)
+                    relax[neighbour] = relax[neighbour] - 1 
+                    pred[neighbour] = node
+    return dist
