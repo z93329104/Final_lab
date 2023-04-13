@@ -29,7 +29,7 @@ with open("london_connections.csv", mode = 'r') as file:
             station_line[line[2]] = []
         add_different_value(station_line[line[2]],line[0],line[1])
         path_length[(line[0],line[1])] = line[3]
-print(direct_dis)
+        path_length[(line[1],line[0])] = line[3]
 
 def h(s,d):
     return ((direct_dis[s][0] - direct_dis[d][0])**2 + (direct_dis[s][1] - direct_dis[d][1])**2)**(1/2)
