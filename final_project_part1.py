@@ -161,3 +161,56 @@ def bellman_ford_approx(G, source, k):
                     relax[neighbour] = relax[neighbour] - 1 
                     pred[neighbour] = node
     return dist
+
+def a_star(G, s, d, h):
+    pred = {} #Predecessor dictionary. Isn't returned, but here for your understanding
+    dist = {} #Distance dictionary
+    Q = min_heap.MinHeap([])
+    nodes = list(G.adj.keys())
+    for node in nodes:
+        Q.insert(min_heap.Element(node, float("inf")))
+        dist[node] = float("inf")
+    Q.decrease_key(s, h[s])   
+    while not Q.is_empty():
+        current_element = Q.extract_min()
+        if current_element == d:
+            break
+        current_node = current_element.value
+        dist[current_node] = current_element.key - h[current_node]
+        for neighbour in G.adj[current_node]:
+            if dist[current_node] + G.w(current_node, neighbour) < dist[neighbour]:
+                Q.decrease_key(neighbour, dist[current_node] + G.w(current_node, neighbour) + h[neighbour] )
+                dist[neighbour] = dist[current_node] + G.w(current_node, neighbour)
+                pred[neighbour] = current_node
+    return (pred, path_from_pred(pred,s,d)) 
+
+
+def path_from_pred(pred,start_node,end_node):
+    path = []
+    current_node = end_node
+    while current_node != start_node:
+        path.append(current_node)
+        current_node = pred[current_node]
+    path.append(current_node)
+    path.reverse()
+    return path
+
+# Test
+'''
+G=DirectedWeightedGraph()
+G.add_node(1)
+G.add_node(2)
+G.add_node(3)
+G.add_node(4)
+G.add_node(5)
+G.add_node(6)
+G.add_edge(1,2,5)
+G.add_edge(2,3,5)
+G.add_edge(3,4,3)
+G.add_edge(4,5,3)
+G.add_edge(1,5,7)
+G.add_edge(5,6,1)
+h = {1:2,2:4,3:3,4:2,5:1,6:0}
+d=a_star(G,1,6,h)
+print(d)
+'''
